@@ -1,4 +1,5 @@
 # 타겟 넘버 - 프로그래머스 고득점 문제
+# dfs 
 
 def solution(numbers,target):
     count=0
