@@ -76,3 +76,24 @@ def solution4(steps):
         a,b=b,a+b
     return b
     
+    
+    
+# 만약, 가능한 모든 경로를 return 하라고 한다면? -> backtracking
+def climb_paths(steps):
+    res, path = [], []    
+    def dfs(cur_step):
+        if cur_step == steps:
+            res.append(path[:])
+            return
+        if cur_step > steps:
+            return
+        path.append(1)
+        dfs(cur_step+1)
+        path.pop()
+        path.append(2)
+        dfs(cur_step+2)
+        path.pop()
+    dfs(0)
+    return res
+
+print(climb_paths(steps=3))            
