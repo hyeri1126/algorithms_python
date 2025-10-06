@@ -107,3 +107,34 @@ edges_w = [[2,1,2],[2,3,5],[2,4,1],[4,3,3]]
 
 print(edges_to_adj(edges))
 print(edges_to_adj_w(edges_w))
+
+
+# 인접 행렬 -> 인접 리스트
+# 1. 무가중치
+def adjmat_to_adjlist(admat):
+    n = len(admat)
+    adj = {i: [] for i in range(n)}
+    for i in range(n):
+        for j in range(n):
+            if admat[i][j]:
+                if i != j :
+                    adj[i].append(j)
+    return adj
+print(adjmat_to_adjlist(admat=[[1,1,0],[1,1,0],[0,0,1]]))
+
+# 2. 가중치
+def adjmat_to_adjlist_w(admat_w):
+    n = len(admat_w)
+    adj = {i:[] for i in range(n)}
+    for i in range(n):
+        for j in range(n):
+            if admat_w[i][j]:
+                adj[i].append((j,admat_w[i][j]))
+    return adj
+# 테스트
+admat_w = [
+    [0, 2, 0],
+    [2, 0, 5],
+    [0, 5, 0]
+]
+print(adjmat_to_adjlist_w(admat_w))

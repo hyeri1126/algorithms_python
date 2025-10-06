@@ -1,28 +1,23 @@
 # 타겟 넘버 - 프로그래머스 고득점 문제
-# dfs 
 
-def solution(numbers,target):
-    count=0
-    path=[] # ('+', 값) or ('-', 값) 기록 
-    
-    # 각 number 마다 +,- 값을 가질 수 있음. 
-    # 그리고 이거의 합이 target이 되면 됨
-    # 그니까 사실 순열,조합 그쪽 문제 아닌가?
-    def dfs(index,sum):
-        if index == len(numbers):
-            if sum == target:
-                count+=1
+def solution(numbers, target):
+    count = 0
+    path=[]
+    def dfs(idx):
+        nonlocal count
+        if idx == len(numbers): # 재귀 종료 조건: numbers를 전체 다 썼다면!
+            if sum(path) == target:
+                count += 1
             return
-        
-        # + 선택하는 경우
-        path.append(('+', numbers[index]))
-        dfs(index+1, sum+numbers[index])
+        path.append(numbers[idx])
+        dfs(idx+1)
         path.pop()
         
-        # - 선택하는 경우
-        path.append(('-',sum-numbers[index])) 
-        dfs(index+1, sum-numbers[index])
+        path.append(-numbers[idx])
+        dfs(idx+1)
         path.pop()
-        
-    dfs(0,0)        
+    dfs(0)
     return count
+
+print(solution(numbers=[1, 1, 1, 1, 1], target=3))
+print(solution(numbers=[4, 1, 2, 1], target=4))
