@@ -67,23 +67,22 @@ def solution(commands):
        
         
     for command in commands:
-        type = command.split()[0]
-        if type == "UPDATE":
-            num = len(command.split())
-            if num == 4:
-                param1, r, c, value = command.split()
+        cmd, *args = command.split()
+        if cmd == "UPDATE":
+            if len(args) == 3:
+                r, c, value = args
                 update_cell(int(r), int(c), value)
             else:
-                param1, value1, value2 = command.split()
+                value1, value2 = args
                 update_value(value1, value2)
-        elif type == "MERGE":
-            param1, r1, c1, r2, c2 = command.split()
+        elif cmd == "MERGE":
+            r1, c1, r2, c2 = args
             merge(int(r1), int(c1), int(r2), int(c2))
-        elif type == "UNMERGE":
-            param1, r, c = command.split()
+        elif cmd == "UNMERGE":
+            r, c = args
             unmerge(int(r),int(c))
-        elif type == "PRINT":
-            param1, r, c = command.split()
+        elif cmd == "PRINT":
+            r, c = args
             print(int(r),int(c))
     
     return answer
