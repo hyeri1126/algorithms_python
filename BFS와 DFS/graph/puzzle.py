@@ -19,13 +19,13 @@
 # 한 조각의 좌표들을 모은 뒤, 튜플 형태 시그니처로 만든다! 즉, 정규화가 포인트!
 # 예: {(2,3),(2,4),(3,3)} → 평행이동 → {(0,0),(0,1),(1,0)} → ((0,0),(0,1),(1,0))
 
-from collections import deque
+from collections import deque,defaultdict
 
 def solution(game_board, table):
     n = len(game_board)
     dirs=[(0,1),(1,0),(0,-1),(-1,0)] # 오른쪽부터 시계방향 탐색
     
-    def collect_puzze_bfs(board, sr, sc, target):
+    def collect_puzze_by_bfs(board, sr, sc, target):
         q = deque([(sr,sc)])
         visited.add((sr,sc))
         cells=[(sr,sc)]
@@ -39,11 +39,71 @@ def solution(game_board, table):
                     cells.append((nr,nc))
         return cells
 
+    # 핵심!!!
+    def normalize(cells):
+        """좌표들을 (0,0) 기준으로 평행이동하고 정렬하여 튜플 시그니처로"""
+        min_r = min(r for r, _ in cells)
+        min_c = min(c for _, c in cells)
+        norm = sorted((r - min_r, c - min_c) for r, c in cells)
+        return tuple(norm)
+    
+    def rotate90(cells):
+        """(r,c)->(c,-r) 회전. 세트/리스트 입력 허용, 결과는 리스트"""
+        return [(c, -r) for (r, c) in cells]
+
+
+    def rotations(signature):
+        """정규화된 시그니처(튜플)를 받아 4회전 모든 시그니처(정규화 후)를 생성"""
+        # 리스트로 변환
+        cells = list(signature)
+        # 0°, 90°, 180°, 270°
+        rots = []
+        cur = cells
+        for _ in range(4):
+            # 정규화 위해 리스트 -> normalize
+            rots.append(normalize(cur))
+            # 다음 회전
+            cur = rotate90(cur)
+        # 중복 제거(모양이 대칭이면 중복 가능)
+        return list(dict.fromkeys(rots))
 
     visited=set()
+    holes=[]
     for r in range(n):
         for c in range(n):
             if table[r][c] == 1 and (r,c) not in visited:
-                puzzle = collect_puzze_bfs(table, r, c, 1)
-    pass
+                puzzle = collect_puzze_by_bfs(table, r, c, 1)
+                
+    visited = set()
+    pieces_by_size = defaultdict(list)
+    for r in range(n):
+        for c in range(n):
+            if table[r][c] == 1 and (r, c) not in visited:
+                cells = collect_puzze_by_bfs(table, r, c, 1)
+                sig = normalize(cells)
+                pieces_by_size[len(sig)].append(sig)
+                
+    answer = 0
+    for hole in holes:
+        size = len(hole)
+        if not pieces_by_size[size]:
+            continue
+
+        # 구멍의 4회전(사실 구멍은 회전할 필요 없지만, 조각/구멍 어느 쪽을 돌려도 무방)
+        # 보통은 "조각"만 4회전하며 비교하는 편이 직관적이지만,
+        # 구현을 단순하게 하기 위해 아래처럼 '조각'의 4회전 집합을 만들어 비교.
+        found_index = -1
+        target_rots = set(rotations(hole))  # 구멍 모양의 가능한 시그니처들 (4회전)
+        # 조각 후보들 순회
+        for i, piece in enumerate(pieces_by_size[size]):
+            piece_rots = set(rotations(piece))
+            if target_rots & piece_rots:
+                found_index = i
+                break
+        if found_index != -1:
+            # 사용한 조각 제거
+            pieces_by_size[size].pop(found_index)
+            answer += size
+
+    return answer
     
